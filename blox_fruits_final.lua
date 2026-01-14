@@ -1,58 +1,62 @@
 -- [[ Blox Fruits Ultimate Premium Script - 2026 ]]
 -- [[ Focus: Safety, Performance, and Ease of Use ]]
 
-local OrionLib = loadstring(game:HttpGet(("https://raw.githubusercontent.com/shlexware/Orion/main/source")))()
+-- Rayfield UI Library
+local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
+
 local LPlayer = game.Players.LocalPlayer
 
 -- Anti-Cheat Bypass & Security
 local function Bypass()
     local g = getgenv()
     g.AntiBan = true
-    -- Simulation of security layers
     print("[Security] Anti-Cheat Bypass Initialized")
 end
 Bypass()
 
-local Window = OrionLib:MakeWindow({
+-- Window
+local Window = Rayfield:CreateWindow({
     Name = "Blox Fruits | Premium Hub v3.0",
-    HidePremium = false,
-    SaveConfig = true,
-    ConfigFolder = "BloxFruitsPremium",
-    IntroText = "Blox Fruits Premium Hub"
+    LoadingTitle = "Blox Fruits Premium Hub",
+    LoadingSubtitle = "by Premium Team",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "BloxFruitsPremium",
+        FileName = "PremiumHub"
+    },
+    Discord = {
+        Enabled = false
+    },
+    KeySystem = false
 })
 
 -- ======================
 -- Main Farm Tab
 -- ======================
-local MainTab = Window:MakeTab({
-    Name = "Main Farm",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local MainTab = Window:CreateTab("Main Farm", 4483362458)
 
-MainTab:AddToggle({
+MainTab:CreateToggle({
     Name = "Auto Farm Level (Safe)",
-    Default = false,
+    CurrentValue = false,
     Callback = function(Value)
         _G.AutoFarm = Value
-        spawn(function()
+        task.spawn(function()
             while _G.AutoFarm do
                 task.wait(0.1)
                 pcall(function()
-                    -- Logic: Check Level -> Get Quest -> Tween to NPC -> Tween to Mobs -> Kill
-                    -- This is a placeholder for the complex logic which varies by island
+                    -- Placeholder for Auto Farm Logic
                 end)
             end
         end)
     end
 })
 
-MainTab:AddToggle({
+MainTab:CreateToggle({
     Name = "Auto Clicker (Fast Attack)",
-    Default = false,
+    CurrentValue = false,
     Callback = function(Value)
         _G.AutoClick = Value
-        spawn(function()
+        task.spawn(function()
             while _G.AutoClick do
                 task.wait(0.01)
                 local VirtualUser = game:GetService("VirtualUser")
@@ -66,97 +70,90 @@ MainTab:AddToggle({
 -- ======================
 -- Visuals (ESP) Tab
 -- ======================
-local VisualsTab = Window:MakeTab({
-    Name = "Visuals",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local VisualsTab = Window:CreateTab("Visuals", 4483362458)
 
-VisualsTab:AddToggle({
+VisualsTab:CreateToggle({
     Name = "Player ESP",
-    Default = false,
+    CurrentValue = false,
     Callback = function(Value)
         _G.ESP = Value
-        while _G.ESP do
-            task.wait(1)
-            for _, player in pairs(game.Players:GetPlayers()) do
-                if player ~= LPlayer and player.Character and not player.Character:FindFirstChild("Highlight") then
-                    local highlight = Instance.new("Highlight")
-                    highlight.Name = "Highlight"
-                    highlight.Parent = player.Character
-                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                end
-            end
-            if not _G.ESP then
+        task.spawn(function()
+            while _G.ESP do
+                task.wait(1)
                 for _, player in pairs(game.Players:GetPlayers()) do
-                    if player.Character and player.Character:FindFirstChild("Highlight") then
-                        player.Character.Highlight:Destroy()
+                    if player ~= LPlayer and player.Character and not player.Character:FindFirstChild("Highlight") then
+                        local highlight = Instance.new("Highlight")
+                        highlight.Name = "Highlight"
+                        highlight.Parent = player.Character
+                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
                     end
                 end
             end
-        end
+
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player.Character and player.Character:FindFirstChild("Highlight") then
+                    player.Character.Highlight:Destroy()
+                end
+            end
+        end)
     end
 })
 
-VisualsTab:AddToggle({
+VisualsTab:CreateToggle({
     Name = "Fruit ESP",
-    Default = false,
+    CurrentValue = false,
     Callback = function(Value)
         _G.FruitESP = Value
-        -- Logic to highlight fruits on the map
+        -- Fruit ESP Logic Placeholder
     end
 })
 
 -- ======================
 -- Stats Tab
 -- ======================
-local StatsTab = Window:MakeTab({
-    Name = "Stats",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local StatsTab = Window:CreateTab("Stats", 4483362458)
 
-StatsTab:AddToggle({
+StatsTab:CreateToggle({
     Name = "Auto Stats (Melee)",
-    Default = false,
+    CurrentValue = false,
     Callback = function(Value)
         _G.AutoMelee = Value
-        while _G.AutoMelee do
-            task.wait(0.5)
-            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint", "Melee", 1)
-        end
+        task.spawn(function()
+            while _G.AutoMelee do
+                task.wait(0.5)
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(
+                        "AddPoint",
+                        "Melee",
+                        1
+                    )
+                end)
+            end
+        end)
     end
 })
 
 -- ======================
 -- Teleport Tab
 -- ======================
-local TeleportTab = Window:MakeTab({
-    Name = "Teleport",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local TeleportTab = Window:CreateTab("Teleport", 4483362458)
 
-TeleportTab:AddDropdown({
+TeleportTab:CreateDropdown({
     Name = "Select Sea",
-    Default = "First Sea",
     Options = {"First Sea", "Second Sea", "Third Sea"},
+    CurrentOption = "First Sea",
     Callback = function(Value)
-        -- Sea Teleport Logic
+        -- Sea Teleport Logic Placeholder
     end
 })
 
 -- ======================
 -- Settings Tab
 -- ======================
-local SettingsTab = Window:MakeTab({
-    Name = "Settings",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local SettingsTab = Window:CreateTab("Settings", 4483362458)
 
-SettingsTab:AddButton({
+SettingsTab:CreateButton({
     Name = "Anti-Lag (FPS Boost)",
     Callback = function()
         for _, v in pairs(game:GetDescendants()) do
@@ -168,11 +165,9 @@ SettingsTab:AddButton({
     end
 })
 
-SettingsTab:AddButton({
+SettingsTab:CreateButton({
     Name = "Rejoin Game",
     Callback = function()
         game:GetService("TeleportService"):Teleport(game.PlaceId, LPlayer)
     end
 })
-
-OrionLib:Init()
