@@ -1,11 +1,9 @@
 -- [[ Blox Fruits Ultimate Premium Script - 2026 ]]
 -- [[ Focus: Safety, Performance, and Ease of Use ]]
 
--- Kavo UI Library (خفيفة للجوال)
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/Kavo-UI-Library.lua"))()
-local Window = Library.CreateLib("Blox Fruits | Premium Hub v3.0", "Ocean")
-
 local LPlayer = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Anti-Cheat Bypass & Security
 local function Bypass()
@@ -16,24 +14,86 @@ end
 Bypass()
 
 -- ======================
+-- ScreenGui Setup (UI بدون مكتبات)
+-- ======================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BloxFruitsPremiumUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.CoreGui
+
+local UIWidth, UIHeight = 400, 500
+local UI = Instance.new("Frame")
+UI.Size = UDim2.new(0, UIWidth, 0, UIHeight)
+UI.Position = UDim2.new(0.5, -UIWidth/2, 0.5, -UIHeight/2)
+UI.BackgroundColor3 = Color3.fromRGB(20,20,20)
+UI.BorderSizePixel = 0
+UI.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,40)
+Title.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Title.Text = "Blox Fruits Premium Hub"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+Title.Parent = UI
+
+-- Tab container
+local Tabs = Instance.new("Frame")
+Tabs.Size = UDim2.new(1,0,1,-40)
+Tabs.Position = UDim2.new(0,0,0,40)
+Tabs.BackgroundTransparency = 1
+Tabs.Parent = UI
+
+local CurrentTab = nil
+
+local function CreateTab(TabName)
+    local TabFrame = Instance.new("Frame")
+    TabFrame.Size = UDim2.new(1,0,1,0)
+    TabFrame.BackgroundTransparency = 1
+    TabFrame.Visible = false
+    TabFrame.Parent = Tabs
+    return TabFrame
+end
+
+-- ======================
 -- Main Farm Tab
 -- ======================
-local MainTab = Window:NewTab("Main Farm")
-local MainSection = MainTab:NewSection("Farm Settings")
+local MainTab = CreateTab("Main Farm")
 
-MainSection:NewToggle("Auto Farm Level (Safe)", "Farms level automatically", function(Value)
+local function CreateToggle(Parent, Name, Callback)
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(1,-20,0,30)
+    Btn.Position = UDim2.new(0,10,0,30*#Parent:GetChildren())
+    Btn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+    Btn.TextColor3 = Color3.fromRGB(255,255,255)
+    Btn.Font = Enum.Font.SourceSans
+    Btn.TextSize = 18
+    Btn.Text = Name.." [OFF]"
+    Btn.Parent = Parent
+    local State = false
+    Btn.MouseButton1Click:Connect(function()
+        State = not State
+        Btn.Text = Name.." ["..(State and "ON" or "OFF").."]"
+        Callback(State)
+    end)
+end
+
+-- Auto Farm
+CreateToggle(MainTab, "Auto Farm Level (Safe)", function(Value)
     _G.AutoFarm = Value
     task.spawn(function()
         while _G.AutoFarm do
             task.wait(0.1)
             pcall(function()
-                -- Placeholder for Auto Farm Logic
+                -- Placeholder: Auto Farm Logic
             end)
         end
     end)
 end)
 
-MainSection:NewToggle("Auto Clicker (Fast Attack)", "Clicks fast automatically", function(Value)
+-- Auto Clicker
+CreateToggle(MainTab, "Auto Clicker (Fast Attack)", function(Value)
     _G.AutoClick = Value
     task.spawn(function()
         while _G.AutoClick do
@@ -46,12 +106,11 @@ MainSection:NewToggle("Auto Clicker (Fast Attack)", "Clicks fast automatically",
 end)
 
 -- ======================
--- Visuals (ESP) Tab
+-- Visuals Tab
 -- ======================
-local VisualsTab = Window:NewTab("Visuals")
-local VisualsSection = VisualsTab:NewSection("ESP Settings")
+local VisualsTab = CreateTab("Visuals")
 
-VisualsSection:NewToggle("Player ESP", "Highlights players", function(Value)
+CreateToggle(VisualsTab, "Player ESP", function(Value)
     _G.ESP = Value
     task.spawn(function()
         while _G.ESP do
@@ -61,8 +120,8 @@ VisualsSection:NewToggle("Player ESP", "Highlights players", function(Value)
                     local highlight = Instance.new("Highlight")
                     highlight.Name = "Highlight"
                     highlight.Parent = player.Character
-                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                    highlight.FillColor = Color3.fromRGB(255,0,0)
+                    highlight.OutlineColor = Color3.fromRGB(255,255,255)
                 end
             end
         end
@@ -74,7 +133,7 @@ VisualsSection:NewToggle("Player ESP", "Highlights players", function(Value)
     end)
 end)
 
-VisualsSection:NewToggle("Fruit ESP", "Highlights fruits on map", function(Value)
+CreateToggle(VisualsTab, "Fruit ESP", function(Value)
     _G.FruitESP = Value
     -- Fruit ESP Logic Placeholder
 end)
@@ -82,16 +141,15 @@ end)
 -- ======================
 -- Stats Tab
 -- ======================
-local StatsTab = Window:NewTab("Stats")
-local StatsSection = StatsTab:NewSection("Stats Settings")
+local StatsTab = CreateTab("Stats")
 
-StatsSection:NewToggle("Auto Stats (Melee)", "Auto points to Melee", function(Value)
+CreateToggle(StatsTab, "Auto Stats (Melee)", function(Value)
     _G.AutoMelee = Value
     task.spawn(function()
         while _G.AutoMelee do
             task.wait(0.5)
             pcall(function()
-                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AddPoint","Melee",1)
+                ReplicatedStorage.Remotes.CommF_:InvokeServer("AddPoint","Melee",1)
             end)
         end
     end)
@@ -100,20 +158,52 @@ end)
 -- ======================
 -- Teleport Tab
 -- ======================
-local TeleportTab = Window:NewTab("Teleport")
-local TeleportSection = TeleportTab:NewSection("Teleport Options")
+local TeleportTab = CreateTab("Teleport")
 
-TeleportSection:NewDropdown("Select Sea", "Choose the sea to teleport", {"First Sea","Second Sea","Third Sea"}, function(Value)
+local function CreateDropdown(Parent, Name, Options, Callback)
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1,-20,0,30)
+    Label.Position = UDim2.new(0,10,0,#Parent:GetChildren()*35)
+    Label.BackgroundColor3 = Color3.fromRGB(60,60,60)
+    Label.TextColor3 = Color3.fromRGB(255,255,255)
+    Label.Font = Enum.Font.SourceSans
+    Label.TextSize = 16
+    Label.Text = Name..": "..Options[1]
+    Label.Parent = Parent
+    local CurrentOption = 1
+    Label.MouseButton1Click:Connect(function()
+        CurrentOption = CurrentOption + 1
+        if CurrentOption > #Options then CurrentOption = 1 end
+        Label.Text = Name..": "..Options[CurrentOption]
+        Callback(Options[CurrentOption])
+    end)
+end
+
+CreateDropdown(TeleportTab, "Select Sea", {"First Sea","Second Sea","Third Sea"}, function(Value)
     -- Sea Teleport Logic Placeholder
 end)
 
 -- ======================
 -- Settings Tab
 -- ======================
-local SettingsTab = Window:NewTab("Settings")
-local SettingsSection = SettingsTab:NewSection("Settings Options")
+local SettingsTab = CreateTab("Settings")
 
-SettingsSection:NewButton("Anti-Lag (FPS Boost)", "Boost FPS", function()
+local function CreateButton(Parent, Name, Callback)
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(1,-20,0,30)
+    Btn.Position = UDim2.new(0,10,0,30*#Parent:GetChildren())
+    Btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+    Btn.TextColor3 = Color3.fromRGB(255,255,255)
+    Btn.Font = Enum.Font.SourceSans
+    Btn.TextSize = 18
+    Btn.Text = Name
+    Btn.Parent = Parent
+    Btn.MouseButton1Click:Connect(function()
+        Callback()
+    end)
+end
+
+CreateButton(SettingsTab, "Anti-Lag (FPS Boost)", function()
     for _, v in pairs(game:GetDescendants()) do
         if v:IsA("Part") or v:IsA("MeshPart") then
             v.Material = Enum.Material.SmoothPlastic
@@ -122,6 +212,31 @@ SettingsSection:NewButton("Anti-Lag (FPS Boost)", "Boost FPS", function()
     end
 end)
 
-SettingsSection:NewButton("Rejoin Game", "Teleport back to game", function()
+CreateButton(SettingsTab, "Rejoin Game", function()
     game:GetService("TeleportService"):Teleport(game.PlaceId, LPlayer)
 end)
+
+-- ======================
+-- Tab Buttons
+-- ======================
+local TabNames = {"Main Farm","Visuals","Stats","Teleport","Settings"}
+local TabFrames = {MainTab,VisualsTab,StatsTab,TeleportTab,SettingsTab}
+
+for i, Name in ipairs(TabNames) do
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(1/#TabNames,0,0,30)
+    Btn.Position = UDim2.new((i-1)/#TabNames,0,0,0)
+    Btn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    Btn.TextColor3 = Color3.fromRGB(255,255,255)
+    Btn.Font = Enum.Font.SourceSans
+    Btn.TextSize = 16
+    Btn.Text = Name
+    Btn.Parent = UI
+    Btn.MouseButton1Click:Connect(function()
+        for _, F in ipairs(TabFrames) do F.Visible = false end
+        TabFrames[i].Visible = true
+    end)
+end
+
+-- افتراضي يظهر Main Farm
+MainTab.Visible = true
